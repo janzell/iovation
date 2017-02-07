@@ -1,31 +1,33 @@
 <?php
 
 /**
- * Simple Iovation Library
+ * Simple Iovation Library.
  */
-class IOvation
+class Iovation
 {
-
-    const DRA_ADMIN = "OLTP";
+    const DRA_ADMIN = 'OLTP';
 
     /**
-     * Check Transaction Details URL
+     * Check Transaction Details URL.
+     *
      * @var string
      */
     protected $CTDurl;
     /**
-     * Subscriber ID provided by IOvation
+     * Subscriber ID provided by IOvation.
+     *
      * @var int
      */
     protected $Subscriber;
 
     /**
-     * Password for the API provided by IOvation
+     * Password for the API provided by IOvation.
+     *
      * @var string
      */
     protected $Password;
 
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         $this->CTDurl = $options['CTDurl'];
         $this->Subscriber = $options['Subscriber'];
@@ -33,44 +35,44 @@ class IOvation
     }
 
     /**
-     * Check Iovation Client
+     * Check Iovation Client.
      *
-     * @param  string $userName
-     * @param  string $blackbox
-     * @param  string $ip
-     * @param  string $rules
-     * @param  array $data
+     * @param string $userName
+     * @param string $blackbox
+     * @param string $ip
+     * @param string $rules
+     * @param array  $data
+     *
      * @return
      */
     public function getTransactionDetails($userName, $blackbox, $ip, $rules, $data)
     {
-
-        $result = array();
+        $result = [];
 
         try {
 
             //create soap client
             $client = new SoapClient(null,
-                array(
+                [
                     'connection_timeout' => 3,
-                    'location' => $this->CTDurl,
-                    'style' => SOAP_RPC,
-                    'use' => SOAP_ENCODED,
-                    'uri' => $this->CTDurl . "#CheckTransactionDetails"
-                )
+                    'location'           => $this->CTDurl,
+                    'style'              => SOAP_RPC,
+                    'use'                => SOAP_ENCODED,
+                    'uri'                => $this->CTDurl.'#CheckTransactionDetails',
+                ]
             );
 
             // create list of transaction properties we want to send. It is important to do a SoapVar around each property as you add
             // it to the array to ensure you don't get extra tags added to the XML. You must also convert the arrays to objects otherwise
             // the indexing wrappers (key and val) will be added to the XML as well)
             // also note that SoapParam will want to add extra structure so we need to use SoapVar to add to the array
-            $transactionProperties = (object)array(
-                new SoapVar((object)array('name' => 'onlineId', 'value' => $data['onlineId']), SOAP_ENC_OBJECT, null, null, 'property'),
-                new SoapVar((object)array('name' => 'Email', 'value' => Session::get('email')), SOAP_ENC_OBJECT, null, null, 'property'),
-                new SoapVar((object)array('name' => 'BillingStreet', 'value' => $data['BillingStreet']), SOAP_ENC_OBJECT, null, null, 'property'),
-                new SoapVar((object)array('name' => 'BillingCity', 'value' => $data['BillingCity']), SOAP_ENC_OBJECT, null, null, 'property'),
-                new SoapVar((object)array('name' => 'BillingPostalCode', 'value' => $data['BillingPostalCode']), SOAP_ENC_OBJECT, null, null, 'property')
-            );
+            $transactionProperties = (object) [
+                new SoapVar((object) ['name' => 'onlineId', 'value' => $data['onlineId']], SOAP_ENC_OBJECT, null, null, 'property'),
+                new SoapVar((object) ['name' => 'Email', 'value' => Session::get('email')], SOAP_ENC_OBJECT, null, null, 'property'),
+                new SoapVar((object) ['name' => 'BillingStreet', 'value' => $data['BillingStreet']], SOAP_ENC_OBJECT, null, null, 'property'),
+                new SoapVar((object) ['name' => 'BillingCity', 'value' => $data['BillingCity']], SOAP_ENC_OBJECT, null, null, 'property'),
+                new SoapVar((object) ['name' => 'BillingPostalCode', 'value' => $data['BillingPostalCode']], SOAP_ENC_OBJECT, null, null, 'property'),
+            ];
 
             //Snare Vars
             $result = $client->CheckTransactionDetails(
@@ -83,7 +85,6 @@ class IOvation
                 new SoapParam($rules, 'type'),
                 new SoapParam($transactionProperties, 'txn_properties')
             );
-
         } catch (SoapFault $e) {
             return $e->getMesssage();
         }
@@ -95,16 +96,16 @@ class IOvation
     }
 }
 
-#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
-#         	   SAMPLE USAGE  	         	  #
-#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
+//         	   SAMPLE USAGE  	         	  #
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
 
 $iovation = new Iovation(
-    array(
-        'CTDurl' => 'https://soap.iovation.com/api/CheckTransactionDetails',
+    [
+        'CTDurl'     => 'https://soap.iovation.com/api/CheckTransactionDetails',
         'Subscriber' => 'YourSubscriberCode',
-        'Password' => 'YourIovationPassword'
-    )
+        'Password'   => 'YourIovationPassword',
+    ]
 );
 
 $username = 'YourUserName';
@@ -113,13 +114,13 @@ $ip = ''; //customer ip address
 $rules = ''; //iovation rules
 
 //customer data
-$customer = array(
-    'onlineId' => '',
-    'Email' => '',
-    'BillingStreet' => '',
-    'BillingCity' => '',
+$customer = [
+    'onlineId'          => '',
+    'Email'             => '',
+    'BillingStreet'     => '',
+    'BillingCity'       => '',
     'BillingPostalCode' => '',
-);
+];
 
 $result = $iovation->getTransactionDetails(
     $username,
@@ -130,5 +131,3 @@ $result = $iovation->getTransactionDetails(
 );
 
 print_r($result);
-
-?>
