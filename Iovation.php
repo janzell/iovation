@@ -101,10 +101,10 @@ class IOvation
 
 $iovation = new Iovation(
     array(
-        'CTDurl' => 'https://soap.iovation.com/api/CheckTransactionDetails'
-		'Subscriber' 	=> 'YourSubscriberCode',
-		'Password' 		=> 'YourIovationPassword'
-	)
+        'CTDurl' => 'https://soap.iovation.com/api/CheckTransactionDetails',
+        'Subscriber' => 'YourSubscriberCode',
+        'Password' => 'YourIovationPassword'
+    )
 );
 
 $username = 'YourUserName';
